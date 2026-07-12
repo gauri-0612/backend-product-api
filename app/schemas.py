@@ -1,26 +1,63 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
-class ProductBase(BaseModel):
-    name: str
-    description: Optional[str] = None
-    price: float
-    category: Optional[str] = None
+# === User Schemas ===
+class UserBase(BaseModel):
+    username: str
+    email: EmailStr
+    role: str = "user"
 
-class ProductCreate(ProductBase):
-    pass
+class UserCreate(UserBase):
+    password: str
 
-class ProductUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    price: Optional[float] = None
-    category: Optional[str] = None
+class UserLogin(BaseModel):
+    username: str
+    password: str
 
-class ProductResponse(ProductBase):
+class UserResponse(UserBase):
     id: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+# === Task Schemas ===
+class TaskBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    status: str = "pending"
+    priority: str = "medium"
+    due_date: Optional[datetime] = None
+
+class TaskCreate(TaskBase):
+    user_id: int
+
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
+    priority: Optional[str] = None
+    due_date: Optional[datetime] = None
+
+class TaskResponse(TaskBase):
+    id: int
+    user_id: int
     created_at: datetime
     updated_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True
+
+# === Token Schemas ===
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    user_id: int
+    username: str
+    role: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+    user_id: Optional[int] = None
+    role: Optional[str] = None
